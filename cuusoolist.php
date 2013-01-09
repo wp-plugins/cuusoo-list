@@ -3,7 +3,7 @@
  Plugin Name: CUUSOO List
  Description: Displays a list of specified LEGO&reg; CUUSOO projects in a widget.
  Author: Drew Maughan
- Version: 1.3
+ Version: 1.3.1
  Author URI: http://perfectzerolabs.com
 */
 

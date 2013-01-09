@@ -24,26 +24,41 @@ class CUUSOOList
 	 *
 	 * @return void
 	 */
-	function install()
+	function activate()
 	{
-		add_option('cuusoolist_projects', array());
-		add_option('cuusoolist_method', CUUSOOList::METHOD_API);
+		$list   = get_option('cuusoolist_projects', array());
+		$method = get_option('cuusoolist_method', CUUSOOList::METHOD_API);
+
+		add_option('cuusoolist_projects', $list);
+		add_option('cuusoolist_method', $method);
 		CUUSOOList::schedule_refresh();
 	}
 
 
 	/**
+	 * CUUSOOList::deactivate()
+	 * Runs when the plugin is deactivated.
+	 *
+	 * @return void
+	 */
+	function deactivate()
+	{
+		wp_clear_scheduled_hook( CUUSOOList::EVENT_FETCH );
+		// In the horrific event where multiple events are registered, this should remove all of them.
+	}
+
+	/**
 	 * CUUSOOList::uninstall()
-	 * Run when the plugin is deactivated.
+	 * Run when the plugin is removed.
 	 *
 	 * @return void
 	 */
 	function uninstall()
 	{
+		CUUSOOList::deactivate();
 		delete_option('cuusoolist_projects');
 		delete_option('cuusoolist_method');
 		delete_option('cuusoolist_fetched');
-		wp_unschedule_event( time(), CUUSOOList::EVENT_FETCH );
 	}
 
 
@@ -531,8 +546,9 @@ class CUUSOOList
 
 // Initialise the plugin, adding hooks for installation and uninstallation.
 add_action( 'admin_init', array('CUUSOOList', 'handler') );
-register_activation_hook( __FILE__, array( 'CUUSOOList', 'install' ) );
-register_deactivation_hook( __FILE__, array( 'CUUSOOList', 'uninstall' ) );
+register_activation_hook( __FILE__, array( 'CUUSOOList', 'activate' ) );
+register_deactivation_hook( __FILE__, array( 'CUUSOOList', 'deactivate' ) );
+register_uninstall_hook( __FILE__, array( 'CUUSOOList', 'uninstall' ) );
 
 // Check whether a fetching event is scheduled.
 add_action('wp', array('CUUSOOList', 'schedule_refresh'));

@@ -72,6 +72,10 @@ None yet...
 
 == Changelog ==
 
+= 1.3.1 =
+* Better plugin deactivation handling: only the events for fetching project data should be removed. Project data now
+isn't removed unless the plugin is deleted (via the Plugins menu).
+
 = 1.3 =
 * Fixed a major issue with the fetching event, where more than one could be in effect at once. An absolute nightmare if
 you happen to be page scraping.

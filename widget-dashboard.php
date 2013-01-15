@@ -58,11 +58,11 @@
 					</td>
 					<td style="text-align: right;">
 						<?php
-							$diff = intval($values['difference']);
+							$diff = intval($values['diff']);
 							if ( $diff > 0 ) :
 							?><span style="color: green">+<?php echo $diff; ?></span><?php
 							elseif ( $diff < 0 ) :
-							?><span style="color: ref">-<?php echo $diff; ?></span><?php
+							?><span style="color: red">-<?php echo $diff; ?></span><?php
 							else :
 							?>--<?php
 							endif;
@@ -80,7 +80,7 @@
 					</td>
 					<td style="text-align: right;">
 						<?php
-							$diff = intval($values['difference']);
+							$diff = intval($values['diff']);
 							if ( $diff > 0 ) :
 							?><span style="color: green">+<?php echo $diff; ?></span><?php
 							elseif ( $diff < 0 ) :

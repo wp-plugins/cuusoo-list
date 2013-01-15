@@ -12,6 +12,8 @@ Maintains a list of LEGO CUUSOO projects to display in a widget.
 
 == Description ==
 
+Maintains a list of LEGO CUUSOO projects to display in a widget.
+
 This plugin will allow the user to maintain a list of specific projects on the LEGO CUUSOO web site, and display
 them on their WordPress site using a widget. Data for each specified project is obtained from the LEGO CUUSOO web
 site and made available for display. The widget's template can be customised to get the layout you want.
@@ -71,6 +73,10 @@ None yet...
 None yet...
 
 == Changelog ==
+
+= 1.3.2 =
+* Corrected a typo: the correct key to use for the difference in supporters is 'diff', not 'difference'.
+* No difference in the number of supporters is represented by 0, not two dashes.
 
 = 1.3.1 =
 * Better plugin deactivation handling: only the events for fetching project data should be removed. Project data now

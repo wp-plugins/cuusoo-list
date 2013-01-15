@@ -3,7 +3,7 @@
  Plugin Name: CUUSOO List
  Description: Displays a list of specified LEGO&reg; CUUSOO projects in a widget.
  Author: Drew Maughan
- Version: 1.3.1
+ Version: 1.3.2
  Author URI: http://perfectzerolabs.com
 */
 
@@ -365,7 +365,8 @@ class CUUSOOList
 		// information that the API doesn't provide (title and views).
 		try
 		{
-			$values = array();
+			$values       = array();
+			$supports_num = 0;
 
 			switch ( $method )
 			{
@@ -381,6 +382,8 @@ class CUUSOOList
 						'supports'  => $data->participants->supporters,
 						'bookmarks' => $data->participants->bookmarks
 					);
+
+					$supports_num = intval($data->participants->supporters);
 
 					break;
 
@@ -425,14 +428,11 @@ class CUUSOOList
 
 			// If we're updating an existing project, calculate the difference in supporters between now and the last
 			// update.
+			$values['diff'] = 0;
 			if ( array_key_exists($project_id, $list) )
 			{
 				$last_supports  = intval(str_replace(',', '', $list[$project_id]['supports']));
-				$values['diff'] = $values['supports'] - $last_supports;
-			}
-			else
-			{
-				$values['diff'] = '--';
+				$values['diff'] = $supports_num - $last_supports;
 			}
 
 			// Don't forget to add the label!

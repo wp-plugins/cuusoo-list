@@ -18,7 +18,7 @@ if ( $projects )
 //  $values['label']       the label manually assigned to the project
 //  $values['supports']    number of people supporting the project
 //  $values['bookmarks']   number of people who have bookmarked the project
-//  $values['difference']  difference in number of supporters since the last update.
+//  $values['diff']        difference in number of supporters since the last update.
 //
 //  ONLY AVAILABLE THROUGH THE PAGE SCRAPE METHOD:
 //  $values['title']       the CUUSOO project name

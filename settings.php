@@ -17,7 +17,7 @@
 		CUUSOOList::next_fetch() );
 
 	// Set any error/notice messages based on the 'message' GET value.
-	$message = $_GET['message'];
+	$message = isset($_GET['message']) ? $_GET['message'] : null;
 	$messages[1] = __('CUUSOO project added.', CUUSOOList::DOMAIN);
 	$messages[2] = __('CUUSOO project deleted.', CUUSOOList::DOMAIN);
 	$messages[3] = __('CUUSOO project updated.', CUUSOOList::DOMAIN);
@@ -49,7 +49,7 @@
 				</p>
 
 				<form id="posts-filter" action="" method="get">
-					<input type="hidden" name="page" value="<?php echo Definitions::get_parent_url() ?>"/>
+					<input type="hidden" name="page" value="<?php echo CUUSOOList::get_parent_url(); ?>"/>
 <?php
 // Retrieve and set pagination information
 $s = isset($_GET['s']) ? urldecode($_GET['s']) : ''; // Number of acronyms per page

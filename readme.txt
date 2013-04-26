@@ -74,9 +74,9 @@ None yet...
 
 == Changelog ==
 
-= 1.3.2 =
-* Corrected a typo: the correct key to use for the difference in supporters is 'diff', not 'difference'.
-* No difference in the number of supporters is represented by 0, not two dashes.
+= 1.3.3 =
+* Corrected some general schoolboy errors with the code, namely with GET parameters and function calls.
+* Fetching data via API no loger "forgets" the manually defined label.
 
 = 1.3.1 =
 * Better plugin deactivation handling: only the events for fetching project data should be removed. Project data now

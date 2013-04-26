@@ -43,7 +43,7 @@ else
 			<!-- Label (useful for API fetching). -->
 			<div class="form-field form-required">
 				<label for="label"><?php _e('Label for this project', CUUSOOList::DOMAIN) ?></label>
-				<input name="label" id="label" type="text" value="<?php echo $project['label']; ?>" />
+				<input name="label" id="label" type="text" value="<?php if (isset($project['label'])) echo $project['label']; ?>" />
 			</div>
 
 			<p>The relevant data for the CUUSOO project will be fetched and then automatically updated once a day.</p>

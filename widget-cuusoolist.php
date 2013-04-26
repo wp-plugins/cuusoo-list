@@ -32,13 +32,10 @@ if ( $projects )
 		$url     = "http://lego.cuusoo.com/ideas/view/{$id}";
 
 		// Make the actual project title take precedence if available.
-		$label = $values['title'];
-		if ( empty($label) ) $label = $values['label'];
+		$label = isset($values['title']) ? $values['title'] : ( isset($values['label']) ? $values['label'] : '' );
 		if ( empty($label) ) $label = '<em>untitled</em>';
 
-		echo '<li>';
-		echo "<a href=\"{$url}\" rel=\"external\" target=\"_blank\">{$label}</a>";
-		echo '</li>';
+		echo "<li><a href=\"{$url}\" rel=\"external\" target=\"_blank\">{$label}</a></li>";
 	}
 	echo '</ol>';
 	echo "<p><small><strong>Last updated</strong>: {$fetched}</small></p>";

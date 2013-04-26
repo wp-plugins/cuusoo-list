@@ -3,7 +3,7 @@
  Plugin Name: CUUSOO List
  Description: Displays a list of specified LEGO&reg; CUUSOO projects in a widget.
  Author: Drew Maughan
- Version: 1.3.2
+ Version: 1.3.3
  Author URI: http://perfectzerolabs.com
 */
 
@@ -68,7 +68,7 @@ class CUUSOOList
 	 *
 	 * @return void
 	 */
-	function admin_page()
+	static function admin_page()
 	{
 		include('settings.php');
 	}
@@ -80,7 +80,7 @@ class CUUSOOList
 	 *
 	 * @return void
 	 */
-	function add_options_menu()
+	static function add_options_menu()
 	{
 		add_options_page('CUUSOO List', 'CUUSOO List', 1, 'cuusoolist.php', array('CUUSOOList', 'admin_page'));
 	}
@@ -92,9 +92,9 @@ class CUUSOOList
 	 *
 	 * @return
 	 */
-	function get_parent_url()
+	static function get_parent_url()
 	{
-		if ( array_key_exists('page', $_GET) )
+		if ( isset($_GET['page']) )
 		{
 			return $_GET['page'];
 		}
@@ -107,7 +107,7 @@ class CUUSOOList
 	 *
 	 * @return void
 	 */
-	function handler()
+	static function handler()
 	{
 		load_plugin_textdomain( CUUSOOList::DOMAIN, dirname( plugin_basename( __FILE__ ) ) );
 
@@ -126,7 +126,7 @@ class CUUSOOList
 			}
 			else
 			{
-				$action = $_GET['action'];
+				$action = (isset($_GET['action'])) ? $_GET['action'] : null;
 			}
 
 			switch ($action)
@@ -238,7 +238,7 @@ class CUUSOOList
 	 *
 	 * @return void
 	 */
-	function show_list($s, $n, $p = '1')
+	static function show_list($s, $n, $p = '1')
 	{
 		include('settings-list.php');
 	}
@@ -250,7 +250,7 @@ class CUUSOOList
 	 *
 	 * @return void
 	 */
-	function show_add_form()
+	static function show_add_form()
 	{
 		$project_id = array_key_exists('id', $_GET) ? $_GET['id'] : null;
 		include('settings-add.php');
@@ -263,7 +263,7 @@ class CUUSOOList
 	 *
 	 * @return void
 	 */
-	function show_method_form()
+	static function show_method_form()
 	{
 		include('settings-method.php');
 	}
@@ -275,7 +275,7 @@ class CUUSOOList
 	 *
 	 * @return void
 	 */
-	function show_pagination($s, $n, $p, $t, $filter = false)
+	static function show_pagination($s, $n, $p, $t, $filter = false)
 	{
 		include('settings-pagination.php');
 	}
@@ -287,7 +287,7 @@ class CUUSOOList
 	 *
 	 * @return
 	 */
-	function update($id, $label, $fetch = true)
+	static function update($id, $label, $fetch = true)
 	{
 		if ( empty($id) )
 		{
@@ -338,7 +338,7 @@ class CUUSOOList
 	 *
 	 * @return
 	 */
-	function count_projects()
+	static function count_projects()
 	{
 		$list = get_option('cuusoolist_projects');
 		return count($list);
@@ -353,7 +353,7 @@ class CUUSOOList
 	 *
 	 * @return
 	 */
-	function refresh($project_id, $label)
+	static function refresh($project_id, $label)
 	{
 		$project_id = intval($project_id);
 		if ( $project_id == 0 ) return;
@@ -436,15 +436,18 @@ class CUUSOOList
 			}
 
 			// Don't forget to add the label!
-			$values['label'] = $label;
+			if ($label) $values['label'] = $label;
 
 			// Replace the existing data for the project.
 			$list[$project_id] = $values;
 
+			update_option('cuusoolist_fetch_error', '');
 		}
 		catch (Exception $e)
 		{
 			// If for some reason there was a problem with updating a project.
+			update_option('cuusoolist_fetch_error', 'Failed fetch for ({{$project_id}) on ' .
+			  current_time('timestamp') . ': ' . $e->getMessage());
 ?>
 		<div id="message" class="updated fade">
 			<p><?php echo "Could not fetch project information for {$project_id}: " . $e->getMessage() ?></p>
@@ -482,7 +485,7 @@ class CUUSOOList
    	 *
    	 * @return void
    	 */
-   	function register_widget()
+   	static function register_widget()
    	{
    		register_widget( 'CUUSOOList_Widget' );
 	}
@@ -521,7 +524,7 @@ class CUUSOOList
 	 *
 	 * @return void
 	 */
-	function schedule_refresh()
+	static function schedule_refresh()
 	{
 		if ( CUUSOOList::next_fetch() === false )
 		{
@@ -536,7 +539,7 @@ class CUUSOOList
 	 *
 	 * @return int
 	 */
-	function next_fetch()
+	static function next_fetch()
 	{
 		return wp_next_scheduled( CUUSOOList::EVENT_FETCH );
 	}

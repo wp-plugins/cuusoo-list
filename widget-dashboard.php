@@ -1,10 +1,14 @@
 <?php
 	$list       = get_option('cuusoolist_projects');
 	$method     = get_option('cuusoolist_method');
+	$error      = get_option('cuusoolist_fetch_error');
 	$last_fetch = date_i18n( get_option('date_format') . ' ' . get_option('time_format'),
 		get_option('cuusoolist_fetched') );
 ?>
 	<p><strong>Last fetched:</strong> <?php echo $last_fetch; ?></p>
+<?php if ( $method == CUUSOOList::METHOD_PAGE ) : ?>
+	<p style="color: red;"><?php echo $error; ?></p>
+<?php endif; ?>
 
 	<table class="widefat">
 	    <thead>
@@ -60,9 +64,9 @@
 						<?php
 							$diff = intval($values['diff']);
 							if ( $diff > 0 ) :
-							?><span style="color: green">+<?php echo $diff; ?></span><?php
+							?><span style="color: green">+<?php echo abs($diff); ?></span><?php
 							elseif ( $diff < 0 ) :
-							?><span style="color: red">-<?php echo $diff; ?></span><?php
+							?><span style="color: red">-<?php echo abs($diff); ?></span><?php
 							else :
 							?>--<?php
 							endif;

@@ -1,7 +1,7 @@
 <?php
 $heading      = __('Settings', CUUSOOList::DOMAIN);
 $submit_text  = __('Save', CUUSOOList::DOMAIN);
-$form         = '<form name="setmethod" id="setmethod" method="get" action="" class="add:the-list: validate">';
+$form         = '<form name="setmethod" id="setmethod" method="post" action="">';
 $action       = 'method';
 $nonce_action = 'method_cuusoolist';
 
@@ -28,12 +28,16 @@ $current_method = intval( get_option('cuusoolist_method') );
 			</div>
 
 			<p>
-				<strong>API</strong> is the faster and least intrusive method, but only gets the number of supporters and bookmarks.<br />
-				<strong>Page scrape</strong> obtains more data (and adds a supports/views ratio), but may trigger an extra "view" on each fetch.
+				<strong>API</strong> is faster and less intrusive, but can only obtain the number of supporters and
+				bookmarks for each project.
+			</p>
+			<p>
+				<strong>Page scraping</strong> can obtain more data (including a ratio of supporters to views), but adds
+				one to the project's page views on each fetch.
 			</p>
 
 			<p class="submit">
-				<input type="submit" class="button-primary alignleft" name="submit" value="<?php echo $submit_text ?>" />
+				<button type="submit" class="button-primary alignleft" name="submit"><?php echo $submit_text ?></button>
 			</p>
 		</form>
 	</div>

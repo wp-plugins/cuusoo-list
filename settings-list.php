@@ -1,26 +1,27 @@
+<!-- LIST OF CUUSOO PROJECTS TO TRACK. -->
 <?php
-	$list       = get_option('cuusoolist_projects');
-	$method     = get_option('cuusoolist_method');
+	$projects = get_option('cuusoolist_projects');
+	$method   = get_option('cuusoolist_method');
 ?>
 	<table class="widefat">
 	    <thead>
 			<tr>
 				<th scope="col" class="check-column">
-					<span class="cl-tooltip" title="<?php _e('Select all ', CUUSOOList::DOMAIN) ?>">
+					<span class="cl-tooltip" title="<?php _e('Select all', CUUSOOList::DOMAIN) ?>">
 						<input type="checkbox" onclick="checkAll(document.getElementById('posts-filter'));" />
 					</span>
 				</th>
 				<th scope="col"><?php _e('ID', CUUSOOList::DOMAIN) ?></th>
 <?php if ( $method == CUUSOOList::METHOD_PAGE ) : ?>
-				<th scope="col" colspan="2"><?php _e('title', CUUSOOList::DOMAIN) ?></th>
-				<th scope="col" style="text-align: right;"><?php _e('views', CUUSOOList::DOMAIN) ?></th>
-				<th scope="col" style="text-align: right;"><?php _e('supports', CUUSOOList::DOMAIN) ?></th>
-				<th scope="col" style="text-align: right;"><?php _e('ratio', CUUSOOList::DOMAIN) ?></th>
-				<th scope="col" style="text-align: right;"><?php _e('bookmarks', CUUSOOList::DOMAIN) ?></th>
+				<th scope="col" colspan="2"><?php _e('Title/Label', CUUSOOList::DOMAIN) ?></th>
+				<th scope="col" style="text-align: right;"><?php _e('Views', CUUSOOList::DOMAIN) ?></th>
+				<th scope="col" style="text-align: right;"><?php _e('Supporters', CUUSOOList::DOMAIN) ?></th>
+				<th scope="col" style="text-align: right;"><?php _e('S/V Ratio', CUUSOOList::DOMAIN) ?></th>
+				<th scope="col" style="text-align: right;"><?php _e('Bookmarks', CUUSOOList::DOMAIN) ?></th>
 <?php else: ?>
-				<th scope="col"><?php _e('label', CUUSOOList::DOMAIN) ?></th>
-				<th scope="col" style="text-align: right;"><?php _e('supports', CUUSOOList::DOMAIN) ?></th>
-				<th scope="col" style="text-align: right;"><?php _e('bookmarks', CUUSOOList::DOMAIN) ?></th>
+				<th scope="col"><?php _e('Label', CUUSOOList::DOMAIN) ?></th>
+				<th scope="col" style="text-align: right;"><?php _e('Supporters', CUUSOOList::DOMAIN) ?></th>
+				<th scope="col" style="text-align: right;"><?php _e('Bookmarks', CUUSOOList::DOMAIN) ?></th>
 <?php endif; ?>
 			</tr>
 		</thead>
@@ -34,14 +35,14 @@
 				<th scope="col"><?php _e('ID', CUUSOOList::DOMAIN) ?></th>
 <?php if ( $method == CUUSOOList::METHOD_PAGE ) : ?>
 				<th scope="col" colspan="2"><?php _e('title', CUUSOOList::DOMAIN) ?></th>
-				<th scope="col" style="text-align: right;"><?php _e('views', CUUSOOList::DOMAIN) ?></th>
-				<th scope="col" style="text-align: right;"><?php _e('supports', CUUSOOList::DOMAIN) ?></th>
-				<th scope="col" style="text-align: right;"><?php _e('ratio', CUUSOOList::DOMAIN) ?></th>
-				<th scope="col" style="text-align: right;"><?php _e('bookmarks', CUUSOOList::DOMAIN) ?></th>
+				<th scope="col" style="text-align: right;"><?php _e('Views', CUUSOOList::DOMAIN) ?></th>
+				<th scope="col" style="text-align: right;"><?php _e('Supporters', CUUSOOList::DOMAIN) ?></th>
+				<th scope="col" style="text-align: right;"><?php _e('S/V Ratio', CUUSOOList::DOMAIN) ?></th>
+				<th scope="col" style="text-align: right;"><?php _e('Bookmarks', CUUSOOList::DOMAIN) ?></th>
 <?php else: ?>
-				<th scope="col"><?php _e('label', CUUSOOList::DOMAIN) ?></th>
-				<th scope="col" style="text-align: right;"><?php _e('supports', CUUSOOList::DOMAIN) ?></th>
-				<th scope="col" style="text-align: right;"><?php _e('bookmarks', CUUSOOList::DOMAIN) ?></th>
+				<th scope="col"><?php _e('Label', CUUSOOList::DOMAIN) ?></th>
+				<th scope="col" style="text-align: right;"><?php _e('Supporters', CUUSOOList::DOMAIN) ?></th>
+				<th scope="col" style="text-align: right;"><?php _e('Bookmarks', CUUSOOList::DOMAIN) ?></th>
 <?php endif; ?>
 			</tr>
 	    </tfoot>
@@ -50,7 +51,7 @@
 		$index_start = $n * ( $p - 1 );
 		$index_end   = $n * $p;
 		$index       = 0;
-		foreach ($list as $id => $values)
+		foreach ($projects as $id => $values)
 		{
 		    if (( '' == $s ) || ( ( false !== strpos(strtolower($id), strtolower($s)) ) || ( false !== strpos(strtolower($description), strtolower($s)) ) ))
 			{
@@ -72,14 +73,14 @@
 						<div class="row-actions">
 
 							<span class="edit">
-								<a href="options-general.php?page=<?php echo CUUSOOList::get_parent_url() ?>&amp;action=edit&amp;id=<?php echo $id ?>">
+								<a href="<?php echo CUUSOOList::get_parent_url() ?>&amp;action=edit&amp;id=<?php echo $id ?>">
 									<?php _e('Edit'); ?>
 								</a>
 							</span>
 							&nbsp;|&nbsp;
 							<span class="delete">
 <?php
-					    $link = 'options-general.php?page=' . CUUSOOList::get_parent_url() . '&amp;action=delete&amp;id=' . urlencode($id);
+					    $link = CUUSOOList::get_parent_url() . '&amp;action=delete&amp;id=' . urlencode($id);
 					    $link = ( function_exists('wp_nonce_url') ) ? wp_nonce_url($link, 'delete_cuusoolist') : $link;
 ?>
 								<a class="submitdelete" href="<?php echo $link ?>" onclick="if ( confirm('<?php _e("Confirm the removal of project ID {$id}.", CUUSOOList::DOMAIN) ?>') ) { return true; } return false;">

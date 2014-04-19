@@ -1,6 +1,6 @@
 <div class="tablenav">
 	<div class="alignleft actions">
-		<input type="submit" value="<?php _e('Delete') ?>" name="delete-many" class="button-secondary delete" onclick="if ( confirm('<?php _e("\'OK\' to delete these terms? (\'Cancel\' to abort.)", CUUSOOList::DOMAIN) ?>') ) { return true; } return false;"/>
+		<button type="submit" name="delete-many" class="button-secondary delete" onclick="if ( confirm('<?php _e("\'OK\' to delete these terms? (\'Cancel\' to abort.)", CUUSOOList::DOMAIN) ?>') ) { return true; } return false;"><?php _e('Delete') ?></button>
 		<?php wp_nonce_field('delete_cuusoolist'); ?>
 	</div>
 	<div class="tablenav-pages">

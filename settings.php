@@ -17,25 +17,14 @@
 		CUUSOOList::next_fetch() );
 
 	// Set any error/notice messages based on the 'message' GET value.
-	$message = isset($_GET['message']) ? $_GET['message'] : null;
-	$messages[1] = __('CUUSOO project added.', CUUSOOList::DOMAIN);
-	$messages[2] = __('CUUSOO project deleted.', CUUSOOList::DOMAIN);
-	$messages[3] = __('CUUSOO project updated.', CUUSOOList::DOMAIN);
-	$messages[4] = __('CUUSOO project not added.', CUUSOOList::DOMAIN);
-	$messages[5] = __('CUUSOO project not updated.', CUUSOOList::DOMAIN);
-	$messages[6] = __('CUUSOO project deleted.', CUUSOOList::DOMAIN);
-
-	$messages[7] = __('Data fetching method updated.', CUUSOOList::DOMAIN);
-
-	if (isset($message))
-	{
+	$message = CUUSOOList::message();
+	if (!is_null($message)) :
 ?>
 	<div id="message" class="updated fade">
-		<p><?php echo $messages[$message] ?></p>
+		<p><?php echo $message; ?></p>
 	</div>
-
 <?php
-	}
+	endif;
 ?>
 
 	<br class="clear" />
@@ -48,7 +37,7 @@
 					<strong>Next fetch:</strong> <?php echo $next_fetch ?>
 				</p>
 
-				<form id="posts-filter" action="" method="get">
+				<form id="posts-filter" action="<?php echo CUUSOOList::get_parent_url(); ?>" method="post">
 					<input type="hidden" name="page" value="<?php echo CUUSOOList::get_parent_url(); ?>"/>
 <?php
 // Retrieve and set pagination information
@@ -87,8 +76,8 @@ CUUSOOList::show_pagination($s, $n, $p, $t);
 			<div class="col-wrap">
 				<p>
 					If you've found this plugin useful, feel free to
-					<a href="http://bit.ly/106ekd9" rel="external" target="_blank">buy me a coffee</a>,
-					or send me some spare change.
+					<a href="http://bit.ly/106ekd9" rel="external" target="_blank">buy me a coffee</a>
+					or make a donation.
 				</p>
 				<form action="https://www.paypal.com/cgi-bin/webscr" method="post">
 					<input type="hidden" name="cmd" value="_s-xclick" />

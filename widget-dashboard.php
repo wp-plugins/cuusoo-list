@@ -1,64 +1,55 @@
 <?php
-	$list       = get_option('cuusoolist_projects');
-	$method     = get_option('cuusoolist_method');
+	$projects   = CUUSOOList::get();
 	$error      = get_option('cuusoolist_fetch_error');
-	$last_fetch = date_i18n( get_option('date_format') . ' ' . get_option('time_format'),
-		get_option('cuusoolist_fetched') );
+	$last_fetch = date_i18n( get_option('date_format') . ' ' . get_option('time_format'), CUUSOOList::last_update() );
 ?>
 	<p><strong>Last fetched:</strong> <?php echo $last_fetch; ?></p>
-<?php if ( $method == CUUSOOList::METHOD_PAGE ) : ?>
+<?php if ( $error ) : ?>
 	<p style="color: red;"><?php echo $error; ?></p>
 <?php endif; ?>
 
 	<table class="widefat">
-	    <thead>
+		<thead>
 			<tr>
-<?php if ( $method == CUUSOOList::METHOD_PAGE ) : ?>
-				<th scope="col" colspan="2"><?php _e('title', CUUSOOList::DOMAIN) ?></th>
+				<th scope="col" colspan="2">&nbsp;</th>
+				<th scope="col" style="text-align: right;"><b><?php _e('votes', CUUSOOList::DOMAIN) ?></b></th>
 				<th scope="col" style="text-align: right;"><?php _e('views', CUUSOOList::DOMAIN) ?></th>
-				<th scope="col" style="text-align: right;"><?php _e('supporters', CUUSOOList::DOMAIN) ?></th>
-				<th scope="col">&nbsp;</th>
-				<th scope="col" style="text-align: right;"><?php _e('ratio', CUUSOOList::DOMAIN) ?></th>
-<?php else: ?>
-				<th scope="col"><?php _e('label', CUUSOOList::DOMAIN) ?></th>
-				<th scope="col" style="text-align: right;"><?php _e('supporters', CUUSOOList::DOMAIN) ?></th>
-				<th scope="col">&nbsp;</th>
-				<th scope="col" style="text-align: right;"><?php _e('bookmarks', CUUSOOList::DOMAIN) ?></th>
-<?php endif; ?>
+				<th scope="col">+/-</th>
+				<th scope="col">days</th>
 			</tr>
-	    </thead>
-	    <tbody id="the-list">
-		<?php
-		$index_start = $n * ( $p - 1 );
-		$index_end   = $n * $p;
-		$index       = 0;
-		foreach ($list as $id => $values)
+		</thead>
+		<tbody id="the-list">
+<?php
+	$index_start = $n * ( $p - 1 );
+	$index_end   = $n * $p;
+	$index       = 0;
+	foreach ($projects as $id => $values)
+	{
+		if (( '' == $s ) ||
+			( ( false !== strpos(strtolower($id), strtolower($s)) ) ||
+			( false !== strpos(strtolower($description), strtolower($s)) ) ))
 		{
-		    if (( '' == $s ) || ( ( false !== strpos(strtolower($id), strtolower($s)) ) || ( false !== strpos(strtolower($description), strtolower($s)) ) ))
+			if (0 == $n || (++$index >= $index_start && $index <= $index_end ))
 			{
-				if (0 == $n || (++$index >= $index_start && $index <= $index_end ))
-				{
 ?>
-		    	<tr class="iedit<?php if (0 == $i++ % 2) { echo ' alternate'; } ?>">
-<?php if ( $method == CUUSOOList::METHOD_PAGE ) : ?>
-		    	    <td>
-						<img src="<?php echo stripslashes($values['thumbnail']) ?>" alt="project thumbnail" width="88" height="51" />
+				<tr class="iedit<?php if (0 == $i++ % 2) { echo ' alternate'; } ?>">
+					<td>
+						<a href="<?php echo CUUSOOList::URL_BASE . $id; ?>" target="_blank" rel="external nofollow">
+							<img src="<?php echo stripslashes($values['thumbnail']) ?>" alt="project thumbnail" width="88" />
+						</a>
 					</td>
-		    	    <td>
-<?php if ( !empty($values['title']) ) : ?>
-						<strong><?php echo stripslashes($values['title']) ?></strong>
-						<?php if ( !empty($values['label']) ) : ?><br /><?php echo stripslashes($values['label']) ?><?php endif; ?>
-<?php elseif ( !empty($values['label']) ) : ?>
-						<strong><?php echo stripslashes($values['label']) ?></strong>
-<?php else : ?>
-						<em>untitled</em>
-<?php endif; ?>
+					<td>
+						<a href="<?php echo CUUSOOList::URL_BASE . $id; ?>" target="_blank" rel="external nofollow">
+							<strong><?php echo $values['title'] ?></strong>
+						</a>
+						<br />
+						<small>by <?php echo $values['author'] ?></small>
 					</td>
-		    	    <td style="text-align: right;">
+					<td style="text-align: right;">
+						<b><?php echo $values['supporters'] ?></b>
+					</td>
+					<td style="text-align: right;">
 						<?php echo $values['views'] ?>
-					</td>
-		    	    <td style="text-align: right;">
-						<?php echo $values['supports'] ?>
 					</td>
 					<td style="text-align: right;">
 						<?php
@@ -68,41 +59,20 @@
 							elseif ( $diff < 0 ) :
 							?><span style="color: red">-<?php echo abs($diff); ?></span><?php
 							else :
-							?>--<?php
+							?>-<?php
 							endif;
 						?>
-					</td>
-		    	    <td style="text-align: right;">
-						<?php echo ($values['ratio']) ? $values['ratio'].'%' : '--'; ?>
-					</td>
-<?php else: ?>
-		    	    <td>
-						<strong><?php echo $values['label'] ? stripslashes($values['label']) : '<em>untitled</em>' ?></strong>
-					</td>
-		    	    <td style="text-align: right;">
-						<?php echo $values['supports'] ?>
 					</td>
 					<td style="text-align: right;">
-						<?php
-							$diff = intval($values['diff']);
-							if ( $diff > 0 ) :
-							?><span style="color: green">+<?php echo $diff; ?></span><?php
-							elseif ( $diff < 0 ) :
-							?><span style="color: ref">-<?php echo $diff; ?></span><?php
-							else :
-							?>--<?php
-							endif;
-						?>
+						<span<?php echo $values['days-left'] < 30 ? ' style="color: red;"' : ''; ?>>
+							<?php echo $values['days-left'] ?>
+						</span>
 					</td>
-		    	    <td style="text-align: right;">
-						<?php echo $values['bookmarks'] ?>
-					</td>
-<?php endif; ?>
-		    	</tr>
+				</tr>
 <?php
-				}
-		    }
+			}
 		}
+	}
 ?>
-	    </tbody>
+		</tbody>
 	</table>

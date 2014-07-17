@@ -1,21 +1,24 @@
 <?php
 /*
  Plugin Name: CUUSOO List
- Description: Displays a list of specified LEGO&reg; CUUSOO projects in a widget.
+ Description: Displays a list of specified LEGO&reg; Ideas (formerly CUUSOO) projects in a widget.
  Author: Drew Maughan
- Version: 1.4
+ Version: 2.0
  Author URI: http://perfectzerolabs.com
 */
 
 class CUUSOOList
 {
 
-	const DOMAIN      = 'cuusoolist';
+	const DOMAIN       = 'cuusoolist';
 
-	const METHOD_PAGE = 0;
-	const METHOD_API  = 1;
+	const TARGET_VOTES = 10000; // 10,000 supporters required.
+	const TARGET_DAYS  = 365;   // one year to reach the target.
 
-	const EVENT_FETCH = 'cuusoolist_refresh';
+	const EVENT_FETCH  = 'cuusoolist_refresh';
+
+	const URL_BASE     = 'https://ideas.lego.com/projects/';
+
 
 	static private $message_id = 0;
 
@@ -29,10 +32,7 @@ class CUUSOOList
 	function activate()
 	{
 		$list   = get_option('cuusoolist_projects', array());
-		$method = get_option('cuusoolist_method', CUUSOOList::METHOD_API);
-
 		add_option('cuusoolist_projects', $list);
-		add_option('cuusoolist_method', $method);
 		CUUSOOList::schedule_refresh();
 	}
 
@@ -60,8 +60,9 @@ class CUUSOOList
 	{
 		CUUSOOList::deactivate();
 		delete_option('cuusoolist_projects');
-		delete_option('cuusoolist_method');
+		delete_option('cuusoolist_method'); // from previous version
 		delete_option('cuusoolist_fetched');
+		delete_option('cuusoolist_fetch_error');
 	}
 
 
@@ -71,14 +72,29 @@ class CUUSOOList
 	 *
 	 * @return
 	 */
-	static function get_parent_url()
+	function get_parent_url()
 	{
 		return 'admin.php?page=cuusoo-list';
+	}
 
-		// if ( isset($_POST['page']) )
-		// {
-		// 	return $_POST['page'];
-		// }
+
+	/**
+	 * CUUSOOList::add_options_menu()
+	 * Adds a menu item for the plugin's settings.
+	 *
+	 * @return void
+	 */
+	function add_admin_menu()
+	{
+		add_menu_page(
+			'CUUSOO List Settings',            // page title
+			'CUUSOO List',                     // menu title
+			'manage_options',                  // capability (to see this menu item)
+			'cuusoo-list',                     // identifier/menu slug
+			array('CUUSOOList', 'admin_page'), // callback function to display the page.
+			plugin_dir_url(__FILE__) . 'logo-ideas-menu.png', // icon URL
+			55                                 // menu item position.
+		);
 	}
 
 
@@ -95,28 +111,8 @@ class CUUSOOList
 
 
 	/**
-	 * CUUSOOList::add_options_menu()
-	 * Adds a menu item for the plugin's settings page.
-	 *
-	 * @return void
-	 */
-	static function add_options_menu()
-	{
-		add_menu_page(
-			'CUUSOO List Settings', // page title
-			'CUUSOO List',                     // menu title
-			'manage_options',                  // capability (to see this menu item)
-			'cuusoo-list',                     // menu slug
-			array('CUUSOOList', 'admin_page'), // function to display the page
-			null,                              // icon URL
-			55                                 // menu item position.
-		);
-	}
-
-
-	/**
 	 * CUUSOOList::handler()
-	 * Handles the addition and deletion of CUUSOO projects.
+	 * Handles the addition and deletion of LEGO Ideas projects.
 	 *
 	 * @return void
 	 */
@@ -144,22 +140,22 @@ class CUUSOOList
 		switch ($action)
 		{
 			case 'add':
-				// Adding a CUUSOO project.
+				// Adding a LEGO Ideas project.
 				self::$message_id = CUUSOOList::_project_new();
 				break;
 
 			case 'update':
-				// Updating a CUUSOO project without fetching data.
+				// Updating a LEGO Ideas project without fetching data.
 				self::$message_id = CUUSOOList::_project_update();
 				break;
 
 			case 'delete':
-				// Deleting (or rather removing) a CUUSOO project.
+				// Deleting (or rather removing) a LEGO Ideas project.
 				self::$message_id = CUUSOOList::_project_remove();
 				break;
 
 			case 'delete-many':
-				// Deleting (removing) at least one CUUSOO project.
+				// Deleting (removing) at least one LEGO Ideas project.
 				self::$message_id = CUUSOOList::_project_remove_many();
 				break;
 
@@ -174,7 +170,7 @@ class CUUSOOList
 
 	/**
 	 * CUUSOOList::_project_new()
-	 * Code for adding a new CUUSOO project.
+	 * Code for adding a new LEGO Ideas project.
 	 *
 	 * @return int message number to use.
 	 */
@@ -182,33 +178,13 @@ class CUUSOOList
 	{
 		check_admin_referer('add_cuusoolist');
 
-		$id	     = intval( $_POST['id'] );
-		$label   = $_POST['label'];
-
-		return CUUSOOList::update($id, $label) ? 1 : 4;
-	}
-
-
-	/**
-	 * CUUSOOList::_project_update()
-	 * Code for updating a CUUSOO project.
-	 *
-	 * @return int message number to use.
-	 */
-	static private function _project_update()
-	{
-		check_admin_referer('update_cuusoolist');
-
-		$id	     = intval( $_POST['id'] );
-		$label   = $_POST['label'];
-
-		return CUUSOOList::update($id, $label, false) ? 3 : 5;
+		return CUUSOOList::update( $_POST['new_project'] ) ? 1 : 4;
 	}
 
 
 	/**
 	 * CUUSOOList::_project_remove()
-	 * Code for removing a CUUSOO project.
+	 * Code for removing a LEGO Ideas project.
 	 *
 	 * @return int message number to use.
 	 */
@@ -230,7 +206,7 @@ class CUUSOOList
 
 	/**
 	 * CUUSOOList::_project_remove_many()
-	 * Code for removing one or more CUUSOO projects.
+	 * Code for removing one or more LEGO Ideas projects.
 	 *
 	 * @return int message number to use.
 	 */
@@ -255,30 +231,43 @@ class CUUSOOList
 
 
 	/**
-	 * CUUSOOList::_project_method()
-	 * Code for changing the data fetching method.
+	 * CUUSOOList::get()
+	 * Returns the list of saved LEGO Ideas projects.
 	 *
-	 * @return int message number to use.
+	 * @static
+	 * @return array
 	 */
-	static private function _project_method()
+	static function get()
 	{
-		check_admin_referer('method_cuusoolist');
-
-		if ( !current_user_can('manage_categories') )
-		{
-			wp_die( __('Nuh-uh!') );
-		}
-
-		$method = $_POST['which_method'];
-		update_option('cuusoolist_method', intval($method));
-
-		return 7;
+		return get_option('cuusoolist_projects');
 	}
 
 
 	/**
+	 * CUUSOOList::last_update()
+	 * Returns the last fetch date.
+	 *
+	 * @return string
+	 */
+	static function last_update()
+	{
+		return get_option('cuusoolist_fetched');
+	}
+
+
+	/**
+	 * [url description]
+	 * @param  [type] $project_id [description]
+	 * @return [type]             [description]
+	 */
+	static function url($project_id)
+	{
+		return self::URL_BASE . $project_id;
+	}
+
+	/**
 	 * CUUSOOList::show_list()
-	 * Displays a list of defined CUUSOO projects in a table.
+	 * Displays a list of defined LEGO Ideas projects in a table.
 	 *
 	 * @return void
 	 */
@@ -290,7 +279,7 @@ class CUUSOOList
 
 	/**
 	 * CUUSOOList::show_add_form()
-	 * Displays a form for adding a CUUSOO project, or editing if the id variable is present in $_GET.
+	 * Displays a form for adding a LEGO Ideas project, or editing if the id variable is present in $_GET.
 	 *
 	 * @return void
 	 */
@@ -315,7 +304,7 @@ class CUUSOOList
 
 	/**
 	 * CUUSOOList::show_pagination()
-	 * Displays a pagination bar for the list of CUUSOO projects (in conjunction with CUUSOOList::show_list()).
+	 * Displays a pagination bar for the list of LEGO Ideas projects (in conjunction with CUUSOOList::show_list()).
 	 *
 	 * @return void
 	 */
@@ -331,35 +320,26 @@ class CUUSOOList
 	 *
 	 * @return
 	 */
-	static function update($id, $label, $fetch = true)
+	static function update($id)
 	{
-		$id    = intval($id);
-		$label = sanitize_text_field($label);
-
+		// Accept the ID or the project URL.
+		$id = intval( str_replace(self::URL_BASE, '', $id) );
 		if ( !$id )
 		{
 			// No project ID was provided.
 			return false;
 		}
 
-		if ( $fetch )
-		{
-			// Fetch the project details.
-			CUUSOOList::refresh( $id, $label );
-		}
-		else
-		{
-			$projects               = get_option('cuusoolist_projects');
-			$projects[$id]['label'] = $label;
-			update_option('cuusoolist_projects', $projects);
-		}
+		// Fetch the project details.
+		CUUSOOList::refresh( $id );
+
 		return true;
 	}
 
 
 	/**
 	 * CUUSOOList::delete()
-	 * Removes a CUUSOO project.
+	 * Removes a LEGO Ideas project.
 	 *
 	 * @return
 	 */
@@ -378,7 +358,7 @@ class CUUSOOList
 
 	/**
 	 * CUUSOOList::count_projects()
-	 * Returns the number of defined CUUSOO projects.
+	 * Returns the number of defined LEGO Ideas projects.
 	 *
 	 * @return
 	 */
@@ -391,11 +371,11 @@ class CUUSOOList
 
 	/**
 	 * CUUSOOList::refresh()
-	 * "Refreshes" a CUUSOO project with the current project information.
+	 * "Refreshes" a LEGO Ideas project with the current project information.
 	 *
 	 * @return
 	 */
-	static function refresh($project_id, $label)
+	static function refresh($project_id)
 	{
 		$project_id = intval($project_id);
 		if ( !$project_id )
@@ -404,101 +384,85 @@ class CUUSOOList
 		}
 
 		$projects = get_option('cuusoolist_projects');
-		$method   = get_option('cuusoolist_method');
 
 		try
 		{
 			$values     = array();
 			$supporters = 0;
 
-			switch ( $method )
-			{
-				case CUUSOOList::METHOD_API:
+			// There's no API this time, so fetching the data has to be done via page scraping. This will obviously add
+			// one to the pageview total.
 
-					// Fetching project data via the API.
+			$url  = self::url($project_id);
+			$page = file_get_contents($url);
 
-					$url    = "http://lego.cuusoo.com/api/participations/get/{$project_id}.json";
-					$json   = file_get_contents($url);
-					$data   = json_decode($json);
+			// We parse the contents of the page to get what we're after.
 
-					$values = array(
-						'supports'  => intval($data->participants->supporters),
-						'bookmarks' => intval($data->participants->bookmarks)
-					);
+			// The URL of the project thumbnail, from an Open Graph tag.
+			preg_match('/<meta property="og:image" content="(.*)"/i', $page, $thumbnail);
 
-					$supporters = intval($data->participants->supporters);
+			// The project title, also from an Open Graph tag.
+			preg_match('/<meta property="og:title" content="(.*)"/i', $page, $title);
 
-					break;
+			// The description excerpt, again from an Open Graph tag.
+			preg_match('/<meta property="og:description" content="(.*)"/i', $page, $description);
 
-				case CUUSOOList::METHOD_PAGE:
+			// The author.
+			preg_match('/media-body".*tile-author">(\w*)<\/a>/is', $page, $author);
 
-					// Fetching data via page scraping. More data can be obtained this way, but it will obviously add
-					// one page hit to the total.
+			// The number of supporters.
+			preg_match('/tile-supporters">\s.*h3>(\d+)<\/h3/i', $page, $supporters);
 
-					$url  = "http://lego.cuusoo.com/ideas/view/{$project_id}";
-					$page = file_get_contents($url);
+			// The number of days left to support the project.
+			preg_match('/tile-days-remaining">\s.*h3>(\d+)<\/h3/i', $page, $days_left);
 
-					// Main image (to get the URL of the thumbnail).
-					preg_match('/src="(.*)thumb640x360.jpg" alt="Idea Image"\/>/i', $page, $image);
+			// The number of page views.
+			preg_match('/<span title="(.*) views">/i', $page, $views);
 
-					// Project title.
-					preg_match('/<div id="ideaName" class="projectTitle"><p>(.*)<\/p><\/div>/i', $page, $title);
+			// The number of project comments.
+			preg_match('/<span title="(.*) comments">/i', $page, $comments);
 
-					// Number of supporters.
-					preg_match('/<ul class="supporters">(.*) supporters<\/ul>/i', $page, $support);
+			// The number of project followers.
+			preg_match('/<span title="(.*) followers">/i', $page, $followers);
 
-					// Number of project views.
-					preg_match('/<ul class="views">(.*) views<\/ul>/i', $page, $view);
-
-					// Number of people who bookmarked the project.
-					preg_match('/<ul class="followers">(.*) bookmarked<\/ul>/i', $page, $bookmark);
-
-					// Just to be sure, remove any commas from the supports and views counts.
-					$supporters = intval(str_replace(',', '', $support[1]));
-					$views      = intval(str_replace(',', '', $view[1]));
-					$bookmarks  = intval(str_replace(',', '', $bookmark[1]));
-
-					// Get the juice!
-					$values = array(
-						'title'     => sanitize_text_field( $title[1] ),
-						'thumbnail' => sanitize_text_field( $image[1] ) . 'thumb81x55.jpg',
-						'supports'  => $supporters,
-						'views'     => $views,
-						'bookmarks' => $bookmarks,
-						'ratio'     => round(($supporters / $views) * 100), // ratio of supports/views.
-					);
-
-					break;
-			}
+			// Get the juice!
+			$values = array(
+				'title'       => sanitize_text_field( $title[1] ),
+				'description' => sanitize_text_field( $description[1] ),
+				'author'      => sanitize_text_field( $author[1] ),
+				'thumbnail'   => sanitize_text_field( $thumbnail[1] ),
+				'supporters'  => intval( $supporters[1] ),
+				'followers'   => intval( $followers[1] ),
+				'comments'    => intval( $comments[1] ),
+				'views'       => intval( $views[1] ),
+				'days-left'   => intval( $days_left[1] )
+			);
 
 			// If we're updating an existing project, calculate the difference in supporters between now and the last
 			// update.
 			$values['diff'] = 0;
-			if ( array_key_exists($project_id, $projects) )
+			if ( isset($project_id, $projects) )
 			{
-				$prev_supporters = intval(str_replace(',', '', $projects[$project_id]['supports']));
-				$values['diff']  = $supporters - $prev_supporters;
+				$prev_supporters = intval($projects[$project_id]['supporters']);
+				$values['diff']  = $supporters[1] - $prev_supporters;
 			}
 
-			// Set the project's label, even if it's blank.
-			if ($label)
-			{
-				$values['label'] = sanitize_text_field($label);
-			}
-
-			// Replace the existing data for the project.
+			// Add or update data for the project.
 			$projects[$project_id] = $values;
 
+			// Clear any fetching errors.
 			update_option('cuusoolist_fetch_error', '');
 		}
 		catch (Exception $e)
 		{
-			// There was a problem with updating the project data.
-			update_option('cuusoolist_fetch_error', sprintf('Failed fetch for (%1$u) on %2$s: %3$s',
+			// There was a problem with updating the project data - record an error message.
+			update_option('cuusoolist_fetch_error', sprintf('Problem when fetching data for project %1$u on %2$s: %3$s',
 				$project_id,
 				current_time('timestamp'),
 				$e->getMessage()
 			));
+
+			// Also display an error message.
 ?>
 		<div id="message" class="updated fade">
 			<p><?php echo "Could not fetch project information for {$project_id}: " . $e->getMessage() ?></p>
@@ -507,14 +471,14 @@ class CUUSOOList
 			return;
 		}
 
-		// Update the list of CUUSOO projects.
+		// Update the stored list of LEGO Ideas projects.
 		update_option('cuusoolist_projects', $projects);
 	}
 
 
 	/**
 	 * CUUSOOList::refresh_projects()
-	 * Refreshes each defined CUUSOO project with current information.
+	 * Refreshes each defined LEGO Ideas project with current information.
 	 *
 	 * @return void
 	 */
@@ -531,15 +495,17 @@ class CUUSOOList
 	}
 
 
-   	/**
-   	 * CUUSOOList::register_widget()
-   	 * Registers the sidebar widget for inclusion in themes.
-   	 *
-   	 * @return void
-   	 */
-   	static function register_widget()
-   	{
-   		register_widget( 'CUUSOOList_Widget' );
+	/**
+	 * CUUSOOList::register_widgets()
+	 * Registers sidebar widgets for inclusion in themes.
+	 *
+	 * @return void
+	 */
+	static function register_widgets()
+	{
+		register_widget( 'CUUSOOList_ListWidget' );
+		register_widget( 'CUUSOOList_RandomWidget' );
+		register_widget( 'CUUSOOList_SingleWidget' );
 	}
 
 
@@ -570,8 +536,8 @@ class CUUSOOList
 
 	/**
 	 * CUUSOOList::schedule_refresh()
-	 * Sets up an event for refreshing CUUSOO project data, if one hasn't been set up.
-	 * Refreshing of data occurs once a day.
+	 * Sets up an event for refreshing LEGO Ideas project data, if one hasn't been set up. Refreshing of data occurs
+	 * once a day.
 	 *
 	 * @return void
 	 */
@@ -599,17 +565,23 @@ class CUUSOOList
 	static function message()
 	{
 		$messages = array(
-			1 => __('CUUSOO project added.', CUUSOOList::DOMAIN),
-			2 => __('CUUSOO project removed.', CUUSOOList::DOMAIN),
-			3 => __('CUUSOO project updated.', CUUSOOList::DOMAIN),
-			4 => __('CUUSOO project was not added.', CUUSOOList::DOMAIN),
-			5 => __('CUUSOO project was not updated.', CUUSOOList::DOMAIN),
-			6 => __('CUUSOO project removed.', CUUSOOList::DOMAIN),
+			1 => __('Project was added.', CUUSOOList::DOMAIN),
+			2 => __('Project was removed.', CUUSOOList::DOMAIN),
+			3 => __('Project was updated.', CUUSOOList::DOMAIN),
+			4 => __('Project was not added.', CUUSOOList::DOMAIN),
+			5 => __('Project was not updated.', CUUSOOList::DOMAIN),
+			6 => __('Projects were removed.', CUUSOOList::DOMAIN),
 			7 => __('Data fetching method updated.', CUUSOOList::DOMAIN),
 		);
 
 		return isset($messages[self::$message_id]) ? $messages[self::$message_id] : null;
 	}
+
+	static function message_is_error()
+	{
+		return in_array(self::$message_id, array(4, 5));
+	}
+
 
 }
 
@@ -629,8 +601,8 @@ add_action( 'wp_dashboard_setup', array('CUUSOOList', 'register_dashboard_widget
 add_action( CUUSOOList::EVENT_FETCH, array('CUUSOOList', 'refresh_projects') );
 
 // Add a menu item for the plugin.
-add_action( 'admin_menu', array('CUUSOOList', 'add_options_menu') );
+add_action( 'admin_menu', array('CUUSOOList', 'add_admin_menu') );
 
 // Include the widget class and initialise it so it can be added to a theme.
 include('widget.php');
-add_action( 'widgets_init', array( 'CUUSOOList', 'register_widget' ) );
+add_action( 'widgets_init', array( 'CUUSOOList', 'register_widgets' ) );

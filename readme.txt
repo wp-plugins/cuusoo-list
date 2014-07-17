@@ -1,65 +1,67 @@
 === CUUSOO List ===
 Contributors: legendarydrew
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=89QB8KQSAQ3RE
-Tags: cuusoo, lego, list, widget
+Tags: cuusoo, lego, lego ideas, list, widget
 Requires at least: 3.5
 Tested up to: 3.9
 Stable tag: trunk
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Maintains a list of LEGO CUUSOO projects to display in a widget.
+Maintains a list of LEGO Ideas (formerly CUUSOO) projects to display in a widget.
 
 == Description ==
 
-Maintains a list of LEGO CUUSOO projects to display in a widget.
+Maintains a list of LEGO Ideas (formerly CUUSOO) projects to display in a widget.
 
-This plugin will allow the user to maintain a list of specific projects on the LEGO CUUSOO web site, and display
-them on their WordPress site using a widget. Data for each specified project is obtained from the LEGO CUUSOO web
-site and made available for display. The widget's template can be customised to get the layout you want.
+This plugin will allow the user to maintain and display a list of specific LEGO Ideas projects on their WordPress site,
+by way of sidebar widgets. The templates used for displaying the widgets on your site can be easily customised, to
+display as little or as much information as you want, and how you want it, without having to dig through cryptic code.
 
-An dashboard widget that displays the list of projects, along with any changes in the number of supporters, is also
-added. This will be displayed by default, but can be turned off via the 'Screen Options' menu.
+A dashboard widget that displays your list of projects is also provided, which highlights any change in the number of
+each project's supporters. As with other dashboard widgets it can be turned off via the 'Screen Options' menu.
 
-I developed this plugin for [SilentMode.tv](http://silentmode.tv) to feature my own CUUSOO projects, but didn't get much
-support for any of them so they've been removed.
+I originally developed this plugin for [SilentMode.tv](http://silentmode.tv) to promote my own CUUSOO projects, but
+though they were unsuccessful, the plugin can still be used to help others.
 
-If you have any suggestions for improvements to this plugin, feel free to contact me through
+If you have any suggestions for improvements to this plugin, contact me through the form at
 http://silentmode.tv/contact/.
 
 == Installation ==
 
-1. Extract and copy the 'cuusoo-list' folder to the '/wp-content/plugins/' directory.
+1. Extract and copy the 'cuusoo-list' folder to your '/wp-content/plugins/' directory.
 1. Activate the 'CUUSOO List' plugin through the 'Plugins' menu in WordPress.
-1. Add the LEGO CUUSOO projects you want to track via the 'Settings > CUUSOO List' menu.
-1. Add the 'CUUSOO List' widget to a widget placeholder via the 'Appearance > Widgets' menu.
+1. Add the LEGO Ideas projects you want to track via the 'Settings > CUUSOO List' menu.
+1. Add one of the provided 'CUUSOO List' widgets to a widget placeholder via the 'Appearance > Widgets' menu.
 
-The default template for the widget is 'widget-cuusoolist.php' in the plugin folder, which displays a basic unordered
-list. This can be overridden by creating a 'widget-cuusoolist.php' template file in your theme folder.
+CUUSOO List comes with three widgets:
+
+* **List:** displays a list of selected projects; by default it will show all listed projects.
+* **Random:** displays a randomly chosen project from the ones selected; by default it will choose from all listed projects.
+* **Single:** displays a single chosen project.
+
+The default template for all three widgets is 'widget-cuusoolist.php' in the plugin folder, which displays the projects
+in a very basic ordered list. This template can be overridden by creating a 'widget-cuusoolist.php' template file in
+your theme folder.
+You can customise further by creating widget-cuusoolist-list.php, widget-cuusoolist-random.php and
+widget-cuusoolist-single.php to target list, random and single widgets respectively.
+
+If you'd prefer to do your own coding, you can call CUUSOOList::get() to obtain the list of projects (indexed by their
+project ID), and CUUSOOList::last_update() to obtain the date of the last project data fetch.
 
 == Data fetching ==
 
-Data for each project is fetched as soon as a project is added, and then once a day afterward.
+Data is fetched for a project as soon as it's added, and then once a day thereafter.
 
-There are two methods available for fetching project data from the LEGO CUUSOO web site:
-
-* **API**: this fetches JSON data for the project. This is the fastest and least intrusive method, however only the
-number of supporters and bookmarks for the project is made available. You can use the label field to give each project a
-title or other descriptive text.
-* **Page scrape**: this extracts project data from the project's page. While more project data (title, thumbnail and
-number of views) is made available, this method will generate unwanted page views. If the extra data isn't necessary,
-please stick with the API method.
-
-The data fetching method can be set via the 'Settings > CUUSOO List' menu. Any changes will take effect on the next
-fetch.
-
+As the LEGO Ideas site doesn't have an API, data is obtained via dreaded page scraping: this means that extra, unwanted
+page views will be generated every time data is fetched for each project. Please be respectful of this when you use the
+plugin.
 
 == Screenshots ==
 
 1. This is the default interface: the API data fetching method is selected by default.
 2. This is the interface when the page scrape method is selected: note the presence of extra columns in the list.
 3. A demonstration of the default CUUSOO List widget.
-4. An example of a custom CUUSOO List widget template, as used on [SilentMode.tv](http://silentmode.tv).
 
 == Frequently Asked Questions ==
 
@@ -70,6 +72,15 @@ None yet...
 None yet...
 
 == Changelog ==
+
+= 2.0 =
+* LEGO CUUSOO has become LEGO Ideas and has completely changed.
+* CUUSOO List has an updated (and nicer) interface, along with a menu icon.
+* Projects can now only be added or deleted; there's no need to edit them.
+* Fetching method is no longer a setting.
+* More information about each project is available: see widget-cuusoolist.php.
+* Three widgets instead of one have been provided: list, random and single.
+* Replaced references to LEGO CUUSOO with LEGO Ideas.
 
 = 1.4 =
 * I no longer have my own CUUSOO projects.
@@ -97,4 +108,4 @@ you happen to be page scraping.
 == Disclaimer ==
 
 LEGO is trademark of The LEGO Group. CUUSOO is a trademark of CUUSOO SYSTEM Co., Ltd. and Elephant Design Co. Ltd.
-None of these companies has anything to do with this plugin.
+Neither of these companies has anything to do with this plugin.

@@ -1,9 +1,19 @@
-<!-- LIST OF CUUSOO PROJECTS TO TRACK. -->
+<!-- LIST OF LEGO IDEAS PROJECTS TO TRACK. -->
 <?php
 	$projects = get_option('cuusoolist_projects');
-	$method   = get_option('cuusoolist_method');
 ?>
 	<table class="widefat">
+		<colgroup>
+			<col width="2em">
+			<col width="5em">
+			<col width="*">
+			<col width="*">
+			<col width="8%">
+			<col width="8%">
+			<col width="8%">
+			<col width="8%">
+			<col width="8%">
+		</colgroup>
 	    <thead>
 			<tr>
 				<th scope="col" class="check-column">
@@ -12,17 +22,12 @@
 					</span>
 				</th>
 				<th scope="col"><?php _e('ID', CUUSOOList::DOMAIN) ?></th>
-<?php if ( $method == CUUSOOList::METHOD_PAGE ) : ?>
-				<th scope="col" colspan="2"><?php _e('Title/Label', CUUSOOList::DOMAIN) ?></th>
+				<th scope="col" colspan="2"><?php _e('Title/Description', CUUSOOList::DOMAIN) ?></th>
 				<th scope="col" style="text-align: right;"><?php _e('Views', CUUSOOList::DOMAIN) ?></th>
+				<th scope="col" style="text-align: right;"><?php _e('Comments', CUUSOOList::DOMAIN) ?></th>
 				<th scope="col" style="text-align: right;"><?php _e('Supporters', CUUSOOList::DOMAIN) ?></th>
-				<th scope="col" style="text-align: right;"><?php _e('S/V Ratio', CUUSOOList::DOMAIN) ?></th>
-				<th scope="col" style="text-align: right;"><?php _e('Bookmarks', CUUSOOList::DOMAIN) ?></th>
-<?php else: ?>
-				<th scope="col"><?php _e('Label', CUUSOOList::DOMAIN) ?></th>
-				<th scope="col" style="text-align: right;"><?php _e('Supporters', CUUSOOList::DOMAIN) ?></th>
-				<th scope="col" style="text-align: right;"><?php _e('Bookmarks', CUUSOOList::DOMAIN) ?></th>
-<?php endif; ?>
+				<th scope="col" style="text-align: right;"><?php _e('Followers', CUUSOOList::DOMAIN) ?></th>
+				<th scope="col" style="text-align: right;"><?php _e('Days left', CUUSOOList::DOMAIN) ?></th>
 			</tr>
 		</thead>
 	    <tfoot>
@@ -33,17 +38,12 @@
 					</span>
 				</th>
 				<th scope="col"><?php _e('ID', CUUSOOList::DOMAIN) ?></th>
-<?php if ( $method == CUUSOOList::METHOD_PAGE ) : ?>
-				<th scope="col" colspan="2"><?php _e('title', CUUSOOList::DOMAIN) ?></th>
+				<th scope="col" colspan="2"><?php _e('Title/Description', CUUSOOList::DOMAIN) ?></th>
 				<th scope="col" style="text-align: right;"><?php _e('Views', CUUSOOList::DOMAIN) ?></th>
+				<th scope="col" style="text-align: right;"><?php _e('Comments', CUUSOOList::DOMAIN) ?></th>
 				<th scope="col" style="text-align: right;"><?php _e('Supporters', CUUSOOList::DOMAIN) ?></th>
-				<th scope="col" style="text-align: right;"><?php _e('S/V Ratio', CUUSOOList::DOMAIN) ?></th>
-				<th scope="col" style="text-align: right;"><?php _e('Bookmarks', CUUSOOList::DOMAIN) ?></th>
-<?php else: ?>
-				<th scope="col"><?php _e('Label', CUUSOOList::DOMAIN) ?></th>
-				<th scope="col" style="text-align: right;"><?php _e('Supporters', CUUSOOList::DOMAIN) ?></th>
-				<th scope="col" style="text-align: right;"><?php _e('Bookmarks', CUUSOOList::DOMAIN) ?></th>
-<?php endif; ?>
+				<th scope="col" style="text-align: right;"><?php _e('Followers', CUUSOOList::DOMAIN) ?></th>
+				<th scope="col" style="text-align: right;"><?php _e('Days left', CUUSOOList::DOMAIN) ?></th>
 			</tr>
 	    </tfoot>
 	    <tbody id="the-list">
@@ -59,25 +59,36 @@
 				{
 ?>
 		    	<tr class="iedit<?php if (0 == $i++ % 2) { echo ' alternate'; } ?>">
+
+		    		<!-- Selection checkbox. -->
 		    	    <th scope="row" class="check-column">
 						<input type="checkbox" name="delete[]" value="<?php echo $id ?>" id="select-<?php echo $id ?>"/>
 		    	    </th>
-		    	    <td class="name column-name">
-						<label for="select-<?php echo $id ?>" style="display:block">
-							<strong>
-								<span class="acronym-tooltip" title="<?php _e("Edit", CUUSOOList::DOMAIN) ?>">
-									<?php echo $id; ?>
-								</span>
-							</strong>
-						</label>
-						<div class="row-actions">
 
-							<span class="edit">
-								<a href="<?php echo CUUSOOList::get_parent_url() ?>&amp;action=edit&amp;id=<?php echo $id ?>">
-									<?php _e('Edit'); ?>
-								</a>
-							</span>
-							&nbsp;|&nbsp;
+		    	    <!-- Project ID. -->
+		    	    <td class="row-id">
+						<label for="select-<?php echo $id ?>" style="display:block">
+							<strong><?php echo $id; ?></strong>
+						</label>
+					</td>
+
+					<!-- Thumbnail. -->
+					<td>
+						<label for="select-<?php echo $id ?>" style="display:block">
+							<img src="<?php echo stripslashes($values['thumbnail']) ?>" alt="" width="88" height="64" />
+						</label>
+					</td>
+
+		    	    <!-- Title/Author/Description, with row actions.-->
+		    	    <td class="name column-name">
+						<label class="row-title" for="select-<?php echo $id ?>">
+							<?php echo ($values['title']) ?>
+						</label>
+						by <?php echo ($values['author']) ?>
+						<br />
+						<small><em><?php echo ($values['description']) ?></em></small>
+
+						<div class="row-actions">
 							<span class="delete">
 <?php
 					    $link = CUUSOOList::get_parent_url() . '&amp;action=delete&amp;id=' . urlencode($id);
@@ -89,37 +100,30 @@
 							</span>
 						</div>
 					</td>
-<?php if ( $method == CUUSOOList::METHOD_PAGE ) : ?>
-					<td>
-						<label for="select-<?php echo $id ?>" style="display:block"><img src="<?php echo stripslashes($values['thumbnail']) ?>" alt="project thumbnail" width="88" height="51" /></label>
-					</td>
-					<td>
-						<label for="select-<?php echo $id ?>" style="display:block">
-							<strong><?php echo stripslashes($values['title']) ?></strong>
-							<?php if ( $values['label'] ) : ?><br /><?php echo $values['label'] ?><?php endif; ?>
-						</label>
-					</td>
+
+					<!-- Number of Pageviews. -->
 					<td style="text-align: right;">
 						<label for="select-<?php echo $id ?>" style="display:block"><?php echo $values['views'] ?></label>
 					</td>
+
+					<!-- Number of Comments. -->
 					<td style="text-align: right;">
-						<label for="select-<?php echo $id ?>" style="display:block"><?php echo $values['supports'] ?></label>
+						<label for="select-<?php echo $id ?>" style="display:block"><?php echo $values['comments'] ?></label>
 					</td>
+
+					<!-- Number of Supporters. -->
 					<td style="text-align: right;">
-						<label for="select-<?php echo $id ?>" style="display:block"><?php echo ($values['ratio']) ? $values['ratio'].'%' : '--'; ?></label>
+						<label for="select-<?php echo $id ?>" style="display:block"><?php echo $values['supporters'] ?></label>
 					</td>
-<?php else: ?>
-					<td>
-						<label for="select-<?php echo $id ?>" style="display:block">
-							<strong><?php echo stripslashes($values['label']) ?></strong>
-						</label>
-					</td>
+
+					<!-- Number of followers. -->
 					<td style="text-align: right;">
-						<label for="select-<?php echo $id ?>" style="display:block"><?php echo $values['supports'] ?></label>
+						<label for="select-<?php echo $id ?>" style="display:block"><?php echo $values['followers']; ?></label>
 					</td>
-<?php endif; ?>
+
+					<!-- Days left to support the project. -->
 					<td style="text-align: right;">
-						<label for="select-<?php echo $id ?>" style="display:block"><?php echo $values['bookmarks']; ?></label>
+						<label for="select-<?php echo $id ?>" style="display:block"><?php echo $values['days-left']; ?></label>
 					</td>
 		    	</tr>
 <?php

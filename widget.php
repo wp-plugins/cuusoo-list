@@ -41,8 +41,8 @@ abstract class CUUSOOList_Widget extends WP_Widget
 		// - widget-cuusoolist.php in the current theme's folder;
 		// - widget-cuusoolist.php in the plugin folder.
 		$templates = array(
-			get_stylesheet_directory() . $this->template,
-			get_stylesheet_directory() . 'widget-cuusoolist.php',
+			get_stylesheet_directory() . DIRECTORY_SEPARATOR . $this->template,
+			get_stylesheet_directory() . DIRECTORY_SEPARATOR . '/widget-cuusoolist.php',
 			plugin_dir_path(__FILE__) . 'widget-cuusoolist.php'
 		);
 		foreach ($templates as $tpl)
@@ -102,6 +102,7 @@ class CUUSOOList_ListWidget extends CUUSOOList_Widget
 	function __construct()
 	{
 		parent::WP_Widget( false, $name = 'CUUSOO List - List', array(
+			'classname'   => 'widget_cuusoolist widget_cuusoolist_list',
 			'description' => __( 'Displays a list of specified LEGO ideas projects.')
 		) );
 		$this->template = 'widget-cuusoolist-list.php';
@@ -190,6 +191,7 @@ class CUUSOOList_RandomWidget extends CUUSOOList_Widget
 	function __construct()
 	{
 		parent::WP_Widget( false, $name = 'CUUSOO List - Random', array(
+			'classname'   => 'widget_cuusoolist widget_cuusoolist_random',
 			'description' => __( 'Displays a random LEGO Ideas project.')
 		) );
 		$this->template = 'widget-cuusoolist-random.php';
@@ -279,6 +281,7 @@ class CUUSOOList_SingleWidget extends CUUSOOList_Widget
 	function __construct()
 	{
 		parent::WP_Widget( false, $name = 'CUUSOO List - Single', array(
+			'classname'   => 'widget_cuusoolist widget_cuusoolist_single',
 			'description' => __( 'Displays a single LEGO Ideas project.')
 		) );
 		$this->template = 'widget-cuusoolist-single.php';

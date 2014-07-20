@@ -73,6 +73,10 @@ None yet...
 
 == Changelog ==
 
+= 2.1 =
+* All three widgets now use the widget_cuusoolist class name.
+* Corrected use of widget-cuusoolist-* theme templates.
+
 = 2.0 =
 * LEGO CUUSOO has become LEGO Ideas and has completely changed.
 * CUUSOO List has an updated (and nicer) interface, along with a menu icon.

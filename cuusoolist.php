@@ -3,7 +3,7 @@
  Plugin Name: CUUSOO List
  Description: Displays a list of specified LEGO&reg; Ideas (formerly CUUSOO) projects in a widget.
  Author: Drew Maughan
- Version: 2.1
+ Version: 2.1.1
  Author URI: http://perfectzerolabs.com
 */
 
@@ -142,11 +142,6 @@ class CUUSOOList
 			case 'add':
 				// Adding a LEGO Ideas project.
 				self::$message_id = CUUSOOList::_project_new();
-				break;
-
-			case 'update':
-				// Updating a LEGO Ideas project without fetching data.
-				self::$message_id = CUUSOOList::_project_update();
 				break;
 
 			case 'delete':
@@ -408,7 +403,8 @@ class CUUSOOList
 			preg_match('/<meta property="og:description" content="(.*)"/i', $page, $description);
 
 			// The author.
-			preg_match('/media-body".*tile-author">(\w*)<\/a>/is', $page, $author);
+			preg_match('/section class="tile created-by-tile">(.*)<\/section>/is', $page, $creator);
+			preg_match('/tile-author">([A-Za-z0-9]*)<\/a>/i', $creator[1], $author);
 
 			// The number of supporters.
 			preg_match('/tile-supporters">\s.*h3>(\d+)<\/h3/i', $page, $supporters);

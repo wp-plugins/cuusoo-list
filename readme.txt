@@ -59,9 +59,9 @@ plugin.
 
 == Screenshots ==
 
-1. This is the default interface: the API data fetching method is selected by default.
-2. This is the interface when the page scrape method is selected: note the presence of extra columns in the list.
-3. A demonstration of the default CUUSOO List widget.
+1. This is the CUUSOO List interface.
+2. The widgets made available by CUUSOO List.
+3. A demonstration of a customised CUUSOO List widget.
 
 == Frequently Asked Questions ==
 
@@ -72,6 +72,9 @@ None yet...
 None yet...
 
 == Changelog ==
+
+= 2.1.1 =
+* Corrected fetching the project owners' usernames from projects.
 
 = 2.1 =
 * All three widgets now use the widget_cuusoolist class name.
@@ -111,5 +114,5 @@ you happen to be page scraping.
 
 == Disclaimer ==
 
-LEGO is trademark of The LEGO Group. CUUSOO is a trademark of CUUSOO SYSTEM Co., Ltd. and Elephant Design Co. Ltd.
+LEGO is a trademark of The LEGO Group. CUUSOO is a trademark of CUUSOO SYSTEM Co., Ltd. and Elephant Design Co. Ltd.
 Neither of these companies has anything to do with this plugin.

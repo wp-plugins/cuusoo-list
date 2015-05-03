@@ -1,8 +1,8 @@
 <!-- ADD/UPDATE CUUSOO PROJECT FORM. -->
 <?php
 	// New project.
-	$heading      = __('Add a CUUSOO project', CUUSOOList::DOMAIN);
-	$submit_text  = __('Add', CUUSOOList::DOMAIN);
+	$heading      = __('Add a CUUSOO project', CUUSOOList::TEXT_DOMAIN);
+	$submit_text  = __('Add', CUUSOOList::TEXT_DOMAIN);
 	$action       = 'add';
 	$nonce_action = 'add_cuusoolist';
 	$project      = array();
@@ -19,7 +19,7 @@
 
 			<!-- CUUSOO project ID. -->
 			<div class="form-field form-required">
-				<label for="new-project-id"><?php _e('CUUSOO Project ID', CUUSOOList::DOMAIN) ?></label>
+				<label for="new-project-id"><?php _e('CUUSOO Project ID', CUUSOOList::TEXT_DOMAIN) ?></label>
 				<input name="new_project" id="new-project-id" class="all-options alignleft" type="text" placeholder="Numeric ID or https://ideas.lego.com/projects/xxxxx" value="<?php echo $project_id; ?>" size="8"
 					<?php if ( $action == 'update' ) : ?> readonly="readonly"<?php endif; ?> />
 				<button type="submit" class="button-primary" name="submit"><?php echo $submit_text; ?></button>

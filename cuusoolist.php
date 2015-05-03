@@ -3,20 +3,18 @@
  Plugin Name: CUUSOO List
  Description: Displays a list of specified LEGO&reg; Ideas (formerly CUUSOO) projects in a widget.
  Author: Drew Maughan
- Version: 2.1.1
+ Version: 2.2
  Author URI: http://perfectzerolabs.com
 */
 
 class CUUSOOList
 {
 
-	const DOMAIN       = 'cuusoolist';
+	const TEXT_DOMAIN  = 'cuusoolist';
 
 	const TARGET_VOTES = 10000; // 10,000 supporters required.
 	const TARGET_DAYS  = 365;   // one year to reach the target.
-
 	const EVENT_FETCH  = 'cuusoolist_refresh';
-
 	const URL_BASE     = 'https://ideas.lego.com/projects/';
 
 
@@ -24,12 +22,12 @@ class CUUSOOList
 
 
 	/**
-	 * CUUSOOList::install()
+	 * CUUSOOList::activate()
 	 * Run when the plugin is activated.
 	 *
 	 * @return void
 	 */
-	function activate()
+	static public function activate()
 	{
 		$list   = get_option('cuusoolist_projects', array());
 		add_option('cuusoolist_projects', $list);
@@ -43,7 +41,7 @@ class CUUSOOList
 	 *
 	 * @return void
 	 */
-	function deactivate()
+	static public function deactivate()
 	{
 		wp_clear_scheduled_hook( CUUSOOList::EVENT_FETCH );
 		// In the horrific event where multiple events are registered, this should remove all of them.
@@ -56,7 +54,7 @@ class CUUSOOList
 	 *
 	 * @return void
 	 */
-	function uninstall()
+	static public function uninstall()
 	{
 		CUUSOOList::deactivate();
 		delete_option('cuusoolist_projects');
@@ -72,7 +70,7 @@ class CUUSOOList
 	 *
 	 * @return
 	 */
-	function get_parent_url()
+	static public function get_parent_url()
 	{
 		return 'admin.php?page=cuusoo-list';
 	}
@@ -84,7 +82,7 @@ class CUUSOOList
 	 *
 	 * @return void
 	 */
-	function add_admin_menu()
+	static public function add_admin_menu()
 	{
 		add_menu_page(
 			'CUUSOO List Settings',            // page title
@@ -104,7 +102,7 @@ class CUUSOOList
 	 *
 	 * @return void
 	 */
-	static function admin_page()
+	static public function admin_page()
 	{
 		include('settings.php');
 	}
@@ -116,15 +114,16 @@ class CUUSOOList
 	 *
 	 * @return void
 	 */
-	static function handler()
+	static public function handler()
 	{
-		if ( !current_user_can( 'manage_options' ) )  {
+		if ( !current_user_can( 'manage_options' ) )
+		{
 			wp_die( __( 'You do not have sufficient permissions to access this page.' ) );
 		}
 
-		load_plugin_textdomain( CUUSOOList::DOMAIN, dirname( plugin_basename( __FILE__ ) ) );
+		load_plugin_textdomain( CUUSOOList::TEXT_DOMAIN, false, dirname( plugin_basename( __FILE__ ) ) . 'lang' );
 
-		$title = __('Definitions', CUUSOOList::DOMAIN);
+		$title = __('Definitions', CUUSOOList::TEXT_DOMAIN);
 		$list  = get_option('cuusoolist_projects');
 
 		// What action are we performing?
@@ -154,9 +153,10 @@ class CUUSOOList
 				self::$message_id = CUUSOOList::_project_remove_many();
 				break;
 
-			case 'method':
+			case 'refresh':
 				// Changing the data fetching method.
-				self::$message_id = CUUSOOList::_project_method();
+				CUUSOOList::refresh_projects();
+				self::$message_id = 9;
 				break;
 
 		}
@@ -232,7 +232,7 @@ class CUUSOOList
 	 * @static
 	 * @return array
 	 */
-	static function get()
+	static public function get()
 	{
 		return get_option('cuusoolist_projects');
 	}
@@ -244,7 +244,7 @@ class CUUSOOList
 	 *
 	 * @return string
 	 */
-	static function last_update()
+	static public function last_update()
 	{
 		return get_option('cuusoolist_fetched');
 	}
@@ -255,7 +255,7 @@ class CUUSOOList
 	 * @param  [type] $project_id [description]
 	 * @return [type]             [description]
 	 */
-	static function url($project_id)
+	static public function url($project_id)
 	{
 		return self::URL_BASE . $project_id;
 	}
@@ -266,7 +266,7 @@ class CUUSOOList
 	 *
 	 * @return void
 	 */
-	static function show_list($s, $n, $p = '1')
+	static public function show_list($s, $n, $p = '1')
 	{
 		include('settings-list.php');
 	}
@@ -278,7 +278,7 @@ class CUUSOOList
 	 *
 	 * @return void
 	 */
-	static function show_add_form()
+	static public function show_add_form()
 	{
 		$project_id = isset($_GET['id']) ? $_GET['id'] : null;
 		include('settings-add.php');
@@ -291,7 +291,7 @@ class CUUSOOList
 	 *
 	 * @return void
 	 */
-	static function show_method_form()
+	static public function show_method_form()
 	{
 		include('settings-method.php');
 	}
@@ -303,7 +303,7 @@ class CUUSOOList
 	 *
 	 * @return void
 	 */
-	static function show_pagination($s, $n, $p, $t, $filter = false)
+	static public function show_pagination($s, $n, $p, $t, $filter = false)
 	{
 		include('settings-pagination.php');
 	}
@@ -315,7 +315,7 @@ class CUUSOOList
 	 *
 	 * @return
 	 */
-	static function update($id)
+	static public function update($id)
 	{
 		// Accept the ID or the project URL.
 		$id = intval( str_replace(self::URL_BASE, '', $id) );
@@ -338,7 +338,7 @@ class CUUSOOList
 	 *
 	 * @return
 	 */
-	function delete($project_id)
+	static public function delete($project_id)
 	{
 		$projects = get_option('cuusoolist_projects');
 		if ( array_key_exists($project_id, $projects) )
@@ -357,7 +357,7 @@ class CUUSOOList
 	 *
 	 * @return
 	 */
-	static function count_projects()
+	static public function count_projects()
 	{
 		$projects = get_option('cuusoolist_projects');
 		return count($projects);
@@ -370,7 +370,7 @@ class CUUSOOList
 	 *
 	 * @return
 	 */
-	static function refresh($project_id)
+	static public function refresh($project_id)
 	{
 		$project_id = intval($project_id);
 		if ( !$project_id )
@@ -410,7 +410,7 @@ class CUUSOOList
 			preg_match('/tile-supporters">\s.*h3>(\d+)<\/h3/i', $page, $supporters);
 
 			// The number of days left to support the project.
-			preg_match('/tile-days-remaining">\s.*h3>(\d+)<\/h3/i', $page, $days_left);
+			preg_match('/<h3>(\d+)<\/h3>\s+<p>Days left<\/p>/i', $page, $days_left);
 
 			// The number of page views.
 			preg_match('/<span title="(.*) views">/i', $page, $views);
@@ -478,7 +478,7 @@ class CUUSOOList
 	 *
 	 * @return void
 	 */
-	function refresh_projects()
+	static public function refresh_projects()
 	{
 		$list = get_option('cuusoolist_projects');
 		foreach ( $list as $id => $values )
@@ -497,7 +497,7 @@ class CUUSOOList
 	 *
 	 * @return void
 	 */
-	static function register_widgets()
+	static public function register_widgets()
 	{
 		register_widget( 'CUUSOOList_ListWidget' );
 		register_widget( 'CUUSOOList_RandomWidget' );
@@ -511,7 +511,7 @@ class CUUSOOList
 	 *
 	 * @return void
 	 */
-	function register_dashboard_widget()
+	static public function register_dashboard_widget()
 	{
 		global $wp_meta_boxes;
 		wp_add_dashboard_widget( 'CUUSOOList_Dashboard_Widget', 'CUUSOO List', array('CUUSOOList', 'dashboard_widget') );
@@ -524,9 +524,9 @@ class CUUSOOList
 	 *
 	 * @return void
 	 */
-	function dashboard_widget()
+	static public function dashboard_widget()
 	{
-		include 'widget-dashboard.php';
+		require_once('widget-dashboard.php');
 	}
 
 
@@ -537,7 +537,7 @@ class CUUSOOList
 	 *
 	 * @return void
 	 */
-	static function schedule_refresh()
+	static public function schedule_refresh()
 	{
 		if ( CUUSOOList::next_fetch() === false )
 		{
@@ -552,28 +552,29 @@ class CUUSOOList
 	 *
 	 * @return int
 	 */
-	static function next_fetch()
+	static public function next_fetch()
 	{
 		return wp_next_scheduled( CUUSOOList::EVENT_FETCH );
 	}
 
 
-	static function message()
+	static public function message()
 	{
 		$messages = array(
-			1 => __('Project was added.', CUUSOOList::DOMAIN),
-			2 => __('Project was removed.', CUUSOOList::DOMAIN),
-			3 => __('Project was updated.', CUUSOOList::DOMAIN),
-			4 => __('Project was not added.', CUUSOOList::DOMAIN),
-			5 => __('Project was not updated.', CUUSOOList::DOMAIN),
-			6 => __('Projects were removed.', CUUSOOList::DOMAIN),
-			7 => __('Data fetching method updated.', CUUSOOList::DOMAIN),
+			1 => __('Project was added.', CUUSOOList::TEXT_DOMAIN),
+			2 => __('Project was removed.', CUUSOOList::TEXT_DOMAIN),
+			3 => __('Project was updated.', CUUSOOList::TEXT_DOMAIN),
+			4 => __('Project was not added.', CUUSOOList::TEXT_DOMAIN),
+			5 => __('Project was not updated.', CUUSOOList::TEXT_DOMAIN),
+			6 => __('Projects were removed.', CUUSOOList::TEXT_DOMAIN),
+			7 => __('Data fetching method updated.', CUUSOOList::TEXT_DOMAIN),
+			9 => __('Projects have been refreshed.', CUUSOOList::TEXT_DOMAIN),
 		);
 
 		return isset($messages[self::$message_id]) ? $messages[self::$message_id] : null;
 	}
 
-	static function message_is_error()
+	static public function message_is_error()
 	{
 		return in_array(self::$message_id, array(4, 5));
 	}

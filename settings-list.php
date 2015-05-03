@@ -8,7 +8,8 @@
 			<col width="5em">
 			<col width="*">
 			<col width="*">
-			<col width="8%">
+			<col width="8em">
+			<col width="6em">
 			<col width="8%">
 			<col width="8%">
 			<col width="8%">
@@ -17,33 +18,33 @@
 	    <thead>
 			<tr>
 				<th scope="col" class="check-column">
-					<span class="cl-tooltip" title="<?php _e('Select all', CUUSOOList::DOMAIN) ?>">
+					<span class="cl-tooltip" title="<?php _e('Select all', CUUSOOList::TEXT_DOMAIN) ?>">
 						<input type="checkbox" onclick="checkAll(document.getElementById('posts-filter'));" />
 					</span>
 				</th>
-				<th scope="col"><?php _e('ID', CUUSOOList::DOMAIN) ?></th>
-				<th scope="col" colspan="2"><?php _e('Title/Description', CUUSOOList::DOMAIN) ?></th>
-				<th scope="col" style="text-align: right;"><?php _e('Views', CUUSOOList::DOMAIN) ?></th>
-				<th scope="col" style="text-align: right;"><?php _e('Comments', CUUSOOList::DOMAIN) ?></th>
-				<th scope="col" style="text-align: right;"><?php _e('Supporters', CUUSOOList::DOMAIN) ?></th>
-				<th scope="col" style="text-align: right;"><?php _e('Followers', CUUSOOList::DOMAIN) ?></th>
-				<th scope="col" style="text-align: right;"><?php _e('Days left', CUUSOOList::DOMAIN) ?></th>
+				<th scope="col"><?php _e('ID', CUUSOOList::TEXT_DOMAIN) ?></th>
+				<th scope="col" colspan="2"><?php _e('Title/Description', CUUSOOList::TEXT_DOMAIN) ?></th>
+				<th scope="col" colspan="2" style="text-align: right;"><?php _e('Supporters', CUUSOOList::TEXT_DOMAIN) ?></th>
+				<th scope="col" style="text-align: right;"><?php _e('Views', CUUSOOList::TEXT_DOMAIN) ?></th>
+				<th scope="col" style="text-align: right;"><?php _e('Comments', CUUSOOList::TEXT_DOMAIN) ?></th>
+				<th scope="col" style="text-align: right;"><?php _e('Followers', CUUSOOList::TEXT_DOMAIN) ?></th>
+				<th scope="col" style="text-align: right;"><?php _e('Days left', CUUSOOList::TEXT_DOMAIN) ?></th>
 			</tr>
 		</thead>
 	    <tfoot>
 			<tr>
 				<th scope="col" class="check-column">
-					<span class="cl-tooltip" title="<?php _e('Select all ', CUUSOOList::DOMAIN) ?>">
+					<span class="cl-tooltip" title="<?php _e('Select all ', CUUSOOList::TEXT_DOMAIN) ?>">
 						<input type="checkbox" onclick="checkAll(document.getElementById('posts-filter'));" />
 					</span>
 				</th>
-				<th scope="col"><?php _e('ID', CUUSOOList::DOMAIN) ?></th>
-				<th scope="col" colspan="2"><?php _e('Title/Description', CUUSOOList::DOMAIN) ?></th>
-				<th scope="col" style="text-align: right;"><?php _e('Views', CUUSOOList::DOMAIN) ?></th>
-				<th scope="col" style="text-align: right;"><?php _e('Comments', CUUSOOList::DOMAIN) ?></th>
-				<th scope="col" style="text-align: right;"><?php _e('Supporters', CUUSOOList::DOMAIN) ?></th>
-				<th scope="col" style="text-align: right;"><?php _e('Followers', CUUSOOList::DOMAIN) ?></th>
-				<th scope="col" style="text-align: right;"><?php _e('Days left', CUUSOOList::DOMAIN) ?></th>
+				<th scope="col"><?php _e('ID', CUUSOOList::TEXT_DOMAIN) ?></th>
+				<th scope="col" colspan="2"><?php _e('Title/Description', CUUSOOList::TEXT_DOMAIN) ?></th>
+				<th scope="col" colspan="2" style="text-align: right;"><?php _e('Supporters', CUUSOOList::TEXT_DOMAIN) ?></th>
+				<th scope="col" style="text-align: right;"><?php _e('Views', CUUSOOList::TEXT_DOMAIN) ?></th>
+				<th scope="col" style="text-align: right;"><?php _e('Comments', CUUSOOList::TEXT_DOMAIN) ?></th>
+				<th scope="col" style="text-align: right;"><?php _e('Followers', CUUSOOList::TEXT_DOMAIN) ?></th>
+				<th scope="col" style="text-align: right;"><?php _e('Days left', CUUSOOList::TEXT_DOMAIN) ?></th>
 			</tr>
 	    </tfoot>
 	    <tbody id="the-list">
@@ -89,16 +90,39 @@
 						<small><em><?php echo ($values['description']) ?></em></small>
 
 						<div class="row-actions">
+							<span class="url">
+								<a href="<?php echo CUUSOOList::url( $id );?>" target="_blank">Project page</a>
+							</span>
+							&nbsp;
 							<span class="delete">
 <?php
 					    $link = CUUSOOList::get_parent_url() . '&amp;action=delete&amp;id=' . urlencode($id);
 					    $link = ( function_exists('wp_nonce_url') ) ? wp_nonce_url($link, 'delete_cuusoolist') : $link;
 ?>
-								<a class="submitdelete" href="<?php echo $link ?>" onclick="if ( confirm('<?php _e("Confirm the removal of project ID {$id}.", CUUSOOList::DOMAIN) ?>') ) { return true; } return false;">
+								<a class="submitdelete" href="<?php echo $link ?>" onclick="if ( confirm('<?php _e("Confirm the removal of project ID {$id}.", CUUSOOList::TEXT_DOMAIN) ?>') ) { return true; } return false;">
 									<?php _e('Delete'); ?>
 								</a>
 							</span>
 						</div>
+					</td>
+
+					<!-- Number of Supporters, with changes. -->
+					<td style="text-align: right;">
+						<label for="select-<?php echo $id ?>" style="display:block"><?php echo $values['supporters'] ?></label>
+					</td>
+					<td style="text-align: right;">
+						<label for="select-<?php echo $id ?>" style="display:block">
+						<?php
+							$diff = intval($values['diff']);
+							if ( $diff > 0 ) :
+							?><span style="color: green">+<?php echo abs($diff); ?></span><?php
+							elseif ( $diff < 0 ) :
+							?><span style="color: red">-<?php echo abs($diff); ?></span><?php
+							else :
+							?>-<?php
+							endif;
+						?>
+						</label>
 					</td>
 
 					<!-- Number of Pageviews. -->
@@ -109,11 +133,6 @@
 					<!-- Number of Comments. -->
 					<td style="text-align: right;">
 						<label for="select-<?php echo $id ?>" style="display:block"><?php echo $values['comments'] ?></label>
-					</td>
-
-					<!-- Number of Supporters. -->
-					<td style="text-align: right;">
-						<label for="select-<?php echo $id ?>" style="display:block"><?php echo $values['supporters'] ?></label>
 					</td>
 
 					<!-- Number of followers. -->

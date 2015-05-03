@@ -6,7 +6,7 @@
 
 	<h2>
 		<img src="<?php echo plugin_dir_url(__FILE__); ?>logo-ideas.png" alt="" style="display: inline-block; vertical-align: middle;" />
-		<?php _e( 'CUUSOO List', CUUSOOList::DOMAIN ); ?> <small>for LEGO Ideas</small>
+		<?php _e( 'CUUSOO List', CUUSOOList::TEXT_DOMAIN ); ?> <small>for LEGO Ideas</small>
 	</h2>
 	<p>This plugin lets you maintain a list of <a href="https://ideas.lego.com">LEGO Ideas</a> projects you want to
 	follow or promote. Display them on your site using CUUSOO List widgets.</p>
@@ -39,10 +39,40 @@
 	$next_fetch = date_i18n( get_option('date_format') . ' ' . get_option('time_format'), CUUSOOList::next_fetch() );
 ?>
 	<div class="alternate">
-		<p>
-			<strong>Last fetch:</strong> <?php echo $last_fetch ?><br />
-			<strong>Next fetch:</strong> <?php echo $next_fetch ?>
-		</p>
+
+		<div id="col-container">
+			<div id="col-right">
+
+				<div class="col-wrap">
+					<form name="add_project" id="add_project" method="post" action="<?php echo CUUSOOList::get_parent_url(); ?>">
+						<input type="hidden" name="page" value="<?php echo CUUSOOList::get_parent_url() ?>"/>
+						<input type="hidden" name="action" value="refresh" />
+						<?php
+							wp_original_referer_field(true, 'previous');
+							wp_nonce_field('refresh_cuusoolist');
+						?>
+						<p>
+						<button type="submit" class="button-primary"
+							onclick="if (!confirm(
+								'<?php _e("Please use this sparingly, as results are fetched through page scraping.", CUUSOOList::TEXT_DOMAIN) ?>'
+								) ) return false;">
+							<?php _e('Refresh projects') ?>
+						</button>
+						</p>
+					</form>
+				</div>
+
+			</div>
+
+			<div id="col-left">
+				<div class="col-wrap">
+					<p>
+						<strong>Last fetch:</strong> <?php echo $last_fetch ?><br />
+						<strong>Next fetch:</strong> <?php echo $next_fetch ?>
+					</p>
+				</div>
+			</div>
+		</div>
 	</div>
 
 	<hr />
@@ -56,8 +86,7 @@
 
 <?php
 // Only display the table and pagination if we have projects.
-$project_count = CUUSOOList::count_projects($s);
-if ($project_count) :
+if ( $project_count = CUUSOOList::count_projects() ) :
 ?>
 
 	<!-- A list of added projects. -->
@@ -89,14 +118,12 @@ endif; // if ($project_count)
 
 	<!-- Make a donation! -->
 	<div class="col-wrap">
-		<p>
-			If you've found this plugin useful, feel free to
-			<a href="http://bit.ly/106ekd9" rel="external" target="_blank">buy me a coffee</a>
-			or make a donation.
-		</p>
 		<form action="https://www.paypal.com/cgi-bin/webscr" method="post">
 			<input type="hidden" name="cmd" value="_s-xclick" />
 			<input type="hidden" name="hosted_button_id" value="89QB8KQSAQ3RE" />
+			If you've found this plugin useful,
+			<a href="http://bit.ly/106ekd9" rel="external" target="_blank">buy me a coffee</a>
+			or make a donation. &nbsp;
 			<input type="image" src="https://www.paypalobjects.com/en_GB/i/btn/btn_donate_SM.gif" border="0" name="submit" alt="The dreaded PayPal button..." />
 			<img alt="" border="0" src="https://www.paypalobjects.com/en_GB/i/scr/pixel.gif" width="1" height="1" />
 		</form>
@@ -104,7 +131,7 @@ endif; // if ($project_count)
 
 	<!-- Disclaimer. -->
 	<p>
-		<small>LEGO is a trademark of the LEGO Group, wicho has no involvement in this plugin.</small>
+		<small>LEGO&reg; is a trademark of the LEGO Group, which has no involvement with this plugin.</small>
 	</p>
 
 </div>

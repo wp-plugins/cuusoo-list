@@ -3,7 +3,7 @@ Contributors: legendarydrew
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=89QB8KQSAQ3RE
 Tags: cuusoo, lego, lego ideas, list, widget
 Requires at least: 3.5
-Tested up to: 3.9
+Tested up to: 4.2.1
 Stable tag: trunk
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -72,6 +72,12 @@ None yet...
 None yet...
 
 == Changelog ==
+
+= 2.2 =
+* Responding to the vulnerability in WordPress mentioned last week: although CUUSOO List is nowhere in the top 1000 plugins and/or shouldn't have been affected, there was _one_ use of the method mentioned.
+* Corrected fetching the number of days left on each project.
+* Added refresh buttons to update all projects' details.
+* Added banner images for those browsing plugins. (I had no idea what graphics to use.)
 
 = 2.1.1 =
 * Corrected fetching the project owners' usernames from projects.
